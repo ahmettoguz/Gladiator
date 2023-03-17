@@ -1,0 +1,13 @@
+﻿  Gladiator.cpp
+C:\Users\lenovo\Desktop\ahmet\C Programming\Projects\Gladiator\Gladiator\Gladiator.cpp(243,17): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\lenovo\Desktop\ahmet\C Programming\Projects\Gladiator\Gladiator\Gladiator.cpp(243,36): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\lenovo\Desktop\ahmet\C Programming\Projects\Gladiator\Gladiator\Gladiator.cpp(352,74): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+C:\Users\lenovo\Desktop\ahmet\C Programming\Projects\Gladiator\Gladiator\Gladiator.cpp(356,19): warning C4477: 'printf' : format string '%.f' requires an argument of type 'double', but variadic argument 1 has type 'int'
+C:\Users\lenovo\Desktop\ahmet\C Programming\Projects\Gladiator\Gladiator\Gladiator.cpp(377,95): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+C:\Users\lenovo\Desktop\ahmet\C Programming\Projects\Gladiator\Gladiator\Gladiator.cpp(381,19): warning C4477: 'printf' : format string '%.f' requires an argument of type 'double', but variadic argument 1 has type 'int'
+C:\Users\lenovo\Desktop\ahmet\C Programming\Projects\Gladiator\Gladiator\Gladiator.cpp(404,116): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+C:\Users\lenovo\Desktop\ahmet\C Programming\Projects\Gladiator\Gladiator\Gladiator.cpp(408,19): warning C4477: 'printf' : format string '%.f' requires an argument of type 'double', but variadic argument 1 has type 'int'
+C:\Users\lenovo\Desktop\ahmet\C Programming\Projects\Gladiator\Gladiator\Gladiator.cpp(452,72): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+C:\Users\lenovo\Desktop\ahmet\C Programming\Projects\Gladiator\Gladiator\Gladiator.cpp(457,18): warning C4477: 'printf' : format string '%.f' requires an argument of type 'double', but variadic argument 1 has type 'int'
+C:\Users\lenovo\Desktop\ahmet\C Programming\Projects\Gladiator\Gladiator\Gladiator.cpp(2104,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  Gladiator.vcxproj -> C:\Users\lenovo\Desktop\ahmet\C Programming\Projects\Gladiator\Debug\Gladiator.exe

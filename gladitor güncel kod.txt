@@ -1,0 +1,2138 @@
+//GLADIATOR
+//Ahmet Oğuz Ergin
+#define _CRT_SECURE_NO_WARNINGS 1
+#include<stdio.h>
+#include<stdlib.h>
+#include<time.h>
+#include<locale.h>
+#include<math.h>
+#include<windows.h>
+#define SIZE 8
+//
+// lvl money hunger respect HP ATK DEF CRT
+//  0    1     2       3     4  5   6   7
+
+//
+//gold -->  hafif ağır  silah zırh iksir
+//            0     1     2    3     4
+
+void opening(char name[], int* namesize, double power[], double gold[],double enemy[])
+{
+	FILE* namehero;
+	FILE* hero;
+	FILE* shopp;
+	FILE* enemi;
+	char choice;
+
+	//welcome user
+	printf("- Y - Yeni oyun\n- K - Kayıtlı oyun: ");
+	do {
+		scanf(" %c", &choice);
+		if ((choice != 'K' && choice != 'Y' && choice != 'y' && choice != 'k'))
+			do
+			{
+				printf("Geçersiz seçim, tekrar gir: ");
+				scanf(" %c", &choice);
+			} while (choice != 'K' && choice != 'Y' && choice != 'y' && choice != 'k');
+			if (choice == 'y' || choice == 'Y')
+			{
+				printf("Yeni oyuna başlamak istediğine emin misin?\n");
+				printf("- E - Evet\n");
+				printf("- H - Hayır: ");
+				scanf(" %c", &choice);
+			}
+			if (choice == 'E' || choice == 'e')
+				choice = 'y';
+			else
+				choice = 'k';
+	} while (choice != 'K' && choice != 'Y' && choice != 'y' && choice != 'k');
+
+	//new game opening
+	if (choice == 'Y' || choice == 'y')
+	{
+		//opening
+		{
+			printf("\n******************************************************************");
+			printf("\nBu an yeni bir hikayenin başlangıcı değil, bir kahramanın doğuşu!");
+			printf("\nLütfen oyuncu adınızı girin: ");
+		}
+
+		//get the name
+		{
+			*namesize = 0;
+			scanf(" %c", &name[*namesize]);
+			*namesize = 1;
+			while (name[*namesize - 1] != '\n')
+			{
+				scanf("%c", &name[*namesize]);
+				(*namesize)++;
+			}
+			name[*namesize - 1] = '\0';
+
+			namehero = fopen("name.txt", "w");
+			fprintf(namehero, "%s", name);
+			fclose(namehero);
+		}
+
+		//display messages
+		{
+			printf("\nHoşgeldin %s. Bir gladyatör olarak seçeneklerinin ne kadar önemli olduğunu unutma.\n", name);
+			printf("Can puanına, açlığına ve saygınlığına dikkat ederek hayatta kalmaya çalış.\n");
+			printf("Can, Atak, Defans, Kritik gibi özelliklerin bulunmakta ve level atladıkça bunları arttırabilirsin.\nBir gladyatör olarak arena'da savaş.\n");
+			printf("Kasabada istediğini yapmakta özgürsün.\nAklının karıştığı yerde bilgi seçeneğini kullanarak neler yapabileceğini öğrenebilirsin...");
+			Sleep(7000);
+		}
+
+		//assign character points
+		{
+			hero = fopen("hero.txt", "w");
+			//            lvl money hunger res HP ATK DEF CRT
+			fprintf(hero, "0 1000 70 50 30 3 10 10");
+			fclose(hero);
+			hero = fopen("hero.txt", "r");
+			for (int i = 0; i < SIZE; i++)
+				fscanf(hero, "%lf", &power[i]);
+			fclose(hero);
+		}
+
+		//assign gold to shop
+		{
+			shopp = fopen("shop.txt", "w");
+			fprintf(shopp, "100 100 100 100 100 2000");
+			fclose(shopp);
+
+			shopp = fopen("shop.txt", "r");
+			fscanf(shopp, "%lf%lf%lf%lf%lf%lf", &gold[0], &gold[1], &gold[2], &gold[3], &gold[4], &gold[5]);
+			fclose(shopp);
+		}
+
+		//assign arena enemy statistics
+		{
+			enemi = fopen("enemy.txt", "w");
+			fprintf(enemi, "25 3 10 10");
+			fclose(enemi);
+
+			enemi = fopen("enemy.txt", "r");
+			for (int i = 0; i < 4; i++)
+				fscanf(enemi, " %lf", &enemy[i]);
+			fclose(enemi);
+		}
+	}
+
+	//load game
+	else
+	{
+		namehero = fopen("name.txt", "r");
+		if (namehero == NULL)
+			printf("Kayıtlı veri bulunmamakta.");
+		else
+		{
+			//get name
+			{
+				*namesize = 0;
+				while (fscanf(namehero, "%c", &name[*namesize]) != EOF)
+					(*namesize)++;
+				name[*namesize] = '\0';
+				fclose(namehero);
+			}
+
+			//get statistics
+			{
+				hero = fopen("hero.txt", "r");
+				for (int i = 0; i < SIZE; i++)
+					fscanf(hero, "%lf", &power[i]);
+				fclose(hero);
+
+				//for (int i = 0; i < SIZE; i++)
+					//printf("%.0f", power[i]);
+			}
+
+			//get price of shops
+			{
+				shopp = fopen("shop.txt", "r");
+				for (int i = 0; i < 6; i++)
+					fscanf(shopp, "%lf", &gold[i]);
+				fclose(shopp);
+			}
+
+			//get the enemy of arena statistics
+			{
+				enemi = fopen("enemy.txt", "r");
+				for (int i = 0; i < 4; i++)
+					fscanf(enemi, "%lf", &enemy[i]);
+				fclose(enemi);
+			}
+		}
+	}
+	printf("\n\n");
+}
+
+void displaygate(void)
+{
+	printf("                                         *                        \n");
+	printf("                                        ***                       \n");
+	printf("                     *                *******                *    \n");
+	printf("                    ***             ***********             ***   \n");
+	printf("                   *****          ***************          *****  \n");
+	printf("                  *******       *******************       ******* \n");
+	printf("                 *************************************************\n");
+	printf("                ****************|                 |****************\n");
+	printf("                ****************|                 |****************\n");
+	printf("                ****************|                 |****************\n");
+	printf("                ****************|                 |****************\n");
+	printf("                ****************|                 |****************\n");
+	printf("                ****************|                 |****************\n");
+	printf("                ****************|                 |****************\n\n");
+	Sleep(500);
+}
+
+void displaytree(char name[])
+{
+	printf("                  *                                                    *        \n");
+	printf("                * * *                                                * * *      \n");
+	printf("               * o * *                                              * * o *     \n");
+	printf("              * * * * *                                            * * * * *    \n");
+	printf("             * * * O * *                                          * O * * / *   \n");
+	printf("               * * * *                                              * * * *     \n");
+	printf("             * * * * 0 *                                          * / * * 0 *   \n");
+	printf("            * * o * * * *                                        * * o * * * *  \n");
+	printf("           * O * * * O * *                                      * O * * * O * * \n");
+	printf("          * * * * 0 * * * *                                    * * * * 0 * * * *\n");
+	printf("                #####                                                #####\n");
+	printf("                #####                                                #####\n");
+	printf("                #####                                                #####\n");
+	printf("                #####                                                #####\n");
+	printf("\n                            Kasabaya hoşgeldin gladyatör %s\n\n", name);
+	Sleep(250);
+}
+
+void savegame(double power[], double gold[], double enemy[])
+{
+	FILE* hero;
+	FILE* shopp;
+	FILE* enemi;
+
+	//decrease hunger
+	if (power[2] != 0)
+		power[2] -= 5;
+
+	//save game
+	hero = fopen("hero.txt", "w");
+	for (int r = 0; r < SIZE; r++)
+		fprintf(hero, "%f ", power[r]);
+	fclose(hero);
+
+	shopp = fopen("shop.txt", "w");
+	for (int i = 0; i < 6; i++)
+		fprintf(shopp, "%f ", gold[i]);
+	fclose(shopp);
+
+	enemi = fopen("enemy.txt", "w");
+	for (int i = 0; i < 4; i++)
+		fprintf(enemi, "%f ", enemy[i]);
+	fclose(enemi);
+
+	printf("\nBilgilerin güvenli bir şekilde kaydedildi.\n");
+	printf("\n\n");
+}
+
+void arena(char name[], double power[], double gold[], double enemy[])
+{
+	int pos,heroo,enemyy,flag=1;
+	char choice;
+	heroo = power[4], enemyy = enemy[0];
+
+	displaygate();
+
+	//display the enterance and get the choice
+	{	
+		printf("                                 Savaş zamanı %s\n", name);
+		printf("                            ***************************\n\n");
+		Sleep(500);
+		printf("                %s                    VS                Düşman\n", name);
+		printf("   *******************************************************************************\n");
+		printf("     Can    Atak     Defans    Kritik    ||     Can    Atak     Defans    Kritik\n");
+		printf("%8.f%7.f%10.f%10.f%16.f%7.f%10.f%10.f\n", power[4], power[5], power[6], power[7], enemy[0], enemy[1], enemy[2], enemy[3]);
+		printf("   *******************************************************************************\n");
+		Sleep(500);
+		printf("\n- S - Savaş\n");
+		printf("- K - Kaç\n");
+		printf("- B - Bilgi\n");
+		do {
+			printf("Seçimini yap: ");
+			scanf(" %c", &choice);
+			if (choice != 's' && choice != 'S' && choice != 'k' && choice != 'K' && choice != 'b' && choice != 'B')
+				printf("geçersiz, ");
+		} while (choice != 's' && choice != 'S' && choice != 'k' && choice != 'K' && choice != 'b' && choice != 'B');
+	}
+
+	//check the respect and hunger
+	if (power[3] < 70)
+	{
+		printf("\nArenada savaşabilmek için saygı toplaman lazım.");
+		Sleep(3000);
+	}
+	else
+	{
+		if( power[2]<50)
+			printf("\nArenada savaşabilmek için karnını doyurman gerekir.");
+		else
+		{
+
+			if (choice == 'b' || choice == 'B')
+			{
+				printf("\nArenada savaşarak level atlayıp güçlenirsin.\n");
+				printf("Kazandıkça level atlarsın, güçlenir ve altın kazanırsın.\n");
+				printf("Aynı zamanda gittikçe düşmanın gücü de artar.\n");
+				printf("3 farklı saldırı 3 türü vardır.\n");
+				printf("Hızlı saldırıda saldırma şansın daha yüksektir ama hasar, atak puanın kadardır.\n");
+				printf("Normal saldırıda saldırma şansın daha düşük ama hasar biraz daha fazladır.\n");
+				printf("Güçlü saldırıda saldırma şansın düşük ama hasarın daha fazladır.\n\n");
+				printf("- S - Savaş\n");
+				printf("- K - Kaç\n");
+				do {
+					printf("Seçimini yap: ");
+					scanf(" %c", &choice);
+					if (choice != 's' && choice != 'S' && choice != 'K' && choice != 'k')
+						printf("Geçersiz seçim, ");
+				} while (choice != 's' && choice != 'S' && choice != 'K' && choice != 'k');
+
+			}
+
+			if (choice == 'k' || choice == 'K');
+
+			else if (choice == 's' || choice == 'S')
+			{
+				printf("\n\n                               ");
+				printf("********************\n");
+
+				while (heroo > 0 && enemyy > 0)
+				{
+					//display hps
+					{
+						printf("                     Senin canın: %d     ||     Düşmanın canı: %d\n", heroo, enemyy);
+						printf("                -------------------------------------------------------\n");
+					}
+					
+
+					//hero turn
+					if (flag == 1)
+					{
+						//generate random number
+						{
+							pos = rand() % ((100 + 1) - 1) + 1;
+							//pos = 90;
+						}
+
+						//display and get the type of the attack
+						{
+							printf("     H - Hızlı saldırı(%%80) || N - Normal saldırı(%%60) || G -Güçlü saldırı(%%40)\n\n");
+							printf("                                       <<<>>>\n");
+							do {
+								printf("                                       Saldır: ");
+								scanf(" %c", &choice);
+							} while (choice != 'h' && choice != 'H' && choice != 'n' && choice != 'N' && choice != 'G' && choice != 'g');
+							printf("                                       <<<>>>");
+							Sleep(500);
+						}
+
+						//attack
+						{
+							if (choice == 'h' || choice == 'H')
+							{
+								//decrease enemy hp and display the message
+								{
+									if (pos / 10 <= 8)
+									{
+										printf("\n\n                               ");
+
+										if (power[5] + ceil(power[7] / 10) >= ceil(enemy[2] / 10))
+										{                                               // 3              
+											printf("Rakibe verilen hasar: %.f\n\n\n", power[5] + ceil(power[7] / 10) - ceil(enemy[2] / 10));
+											enemyy -= power[5] + ceil(power[7] / 10) - ceil(enemy[2] / 10);
+										}
+										else
+										{
+											printf("Rakibe verilen hasar: %.f\n\n\n", 0);
+										}
+									}
+									else
+									{
+										printf("\n\n                                        ");
+										printf("BLOK\n\n\n");
+									}
+								}
+							}
+
+							else if (choice == 'n' || choice == 'N')
+							{
+								//decrease enemy hp and display the message
+								{
+									if (pos / 10 <= 5)
+									{
+										printf("\n\n                               ");
+										if (power[5] + ceil(power[7] / 10) + ceil(power[5] / 3) >= ceil(enemy[2] / 10))
+										{
+											printf("Rakibe verilen hasar: %.f\n\n\n", power[5] + ceil(power[7] / 10) + ceil(power[5] / 3) - ceil(enemy[2] / 10));
+											enemyy -= power[5] + ceil(power[7] / 10) + ceil(power[5] / 3) - ceil(enemy[2] / 10);
+										}
+										else
+										{
+											printf("Rakibe verilen hasar: %.f\n\n\n", 0);
+										}
+									}
+									else
+									{
+										printf("\n\n                                        ");
+										printf("BLOK\n\n\n");
+
+									}
+								}
+
+							}
+
+							else if (choice == 'g' || choice == 'G')
+							{
+								//decrease enemy hp and display the message
+								{
+									if (pos / 10 <= 3)
+									{
+										printf("\n\n                               ");
+										if (power[5] + ceil(power[7] / 10) + ceil(power[5] / 3) + ceil(power[5] / 3) >= ceil(enemy[2] / 10))
+										{
+											printf("Rakibe verilen hasar: %.f\n\n\n", power[5] + ceil(power[7] / 10) + ceil(power[5] / 3) + ceil(power[5] / 3) - ceil(enemy[2] / 10));
+											enemyy -= power[5] + ceil(power[7] / 10) + ceil(power[5] / 3) + ceil(power[5] / 3) - ceil(enemy[2] / 10);
+										}
+										else
+										{
+											printf("Rakibe verilen hasar: %.f\n\n\n", 0);
+										}
+									}
+									else
+									{
+										printf("\n\n                                        ");
+										printf("BLOK\n\n\n");
+									}
+								}
+
+							}
+						}
+
+						flag = 2;
+					}
+
+					//check the hp of enemy \\ enemy attack
+					if (enemyy > 0)
+					{
+						//enemy turn
+						if (flag == 2)
+						{
+							//generate random number
+							{
+								pos = rand() % ((100 + 1) - 1) + 1;
+								//pos = 90;
+							}
+
+							//message
+							{
+								Sleep(500);
+								printf("\n                                   Sıra rakibinde \n");
+								Sleep(500);
+							}
+
+							//display the attack messeage and decrease the hp
+							{
+								if (pos / 10 <= 7)
+								{
+									printf("\n                                   ");
+
+									if (enemy[1] + ceil(enemy[3] / 10) >= ceil(power[6] / 10))
+									{
+										printf("Alınan hasar: %.f\n", enemy[1] + ceil(enemy[3] / 10) - ceil(power[6] / 10));
+										heroo -= enemy[1] + ceil(enemy[3] / 10) - ceil(power[6] / 10);
+										Sleep(500);
+									}
+									else
+									{
+										printf("Alınan hasar: %.f\n", 0);
+										Sleep(500);
+									}
+								}
+								else
+								{
+									printf("\n\n                                        ");
+									printf("BLOK\n");
+									Sleep(500);
+								}
+								printf("                                      <<<<>>>>\n\n\n");
+							}
+							flag = 1;
+						}
+					}
+				}
+
+				//if hero lose
+				if (heroo <= 0)
+				{
+					//display the message 
+					{
+						printf("                                     -----------\n");
+						printf("                                      Kaybettin.\n");
+						printf("                             Yeterince güçlenip tekrar gel.");
+						Sleep(3000);
+					}
+
+					//decrease hunger
+					{
+						power[2] -= 10;
+					}
+				}
+				//if hero win
+				else
+				{
+					//display the message
+					{
+						printf("                                   ---------------\n");
+						printf("                                     Kazandın. !!!\n");
+						Sleep(500);
+						printf("                                 %.f Altın kazandın\n", gold[5]);
+						printf("                             Kasabadaki saygınlığın arttı.\n");
+						Sleep(500);
+
+						//decrease hunger
+						{
+							power[2] -= 10;
+						}
+
+						//increase statistics
+						{
+							//gold
+							power[1] += gold[5];
+							gold[5] += int(gold[5] * 30 / 100);
+
+							//lvl
+							power[0] += 5;
+							if (int(power[0]) % 10 == 0)
+							{
+								printf("                            Tebrikler lvl atladın. !!!\n");
+								do {
+									printf("           Hangi özelliğini yükseltmek istiyorsun A - Atak, D - Defans: ");
+									scanf(" %c", &choice);
+								} while (choice != 'a' && choice != 'A' && choice != 'd' && choice != 'D');
+
+									printf("Gücün başarıyla arttı.\n");
+								if (choice == 'a' || choice == 'A')
+								{
+									power[5] += int(power[5]*1/2);
+									power[7] += int(power[7] * 1 / 2);
+								}
+								else
+								{
+									power[4] += int(power[4] * 1 / 2);
+									power[6] += int(power[6] * 1 / 2);
+								}
+								Sleep(500);
+							}
+
+
+							//enemy
+							for (int i = 0; i < 4; i++)
+								enemy[i] += int(enemy[i] * 30 / 100);
+						}
+					}
+				}
+			}
+
+		}
+	}
+	printf("\n\n\n\n");
+	displaytree(name);
+
+	//save the game
+	savegame(power, gold, enemy);
+}
+
+void displaycasino(char name[])
+{
+	printf("\n\n");
+	printf("          ********************************************************************************************\n");
+	printf("       **************************************************************************************************\n");
+	printf("     ****    $$$$$            $$$$             $$$$$       $$$$$$$$     $$$$       $$$       $$$$$$    ****\n");
+	printf("    ***    $$$$$$$$$         $$  $$           $$$   $       $$$$$$      $$$$$      $$$     $$$$$$$$$$    ***\n");
+	printf("   **     $$$    $$$$       $$    $$         $$$             $$$$       $$$ $$$    $$$    $$$      $$$     **\n");
+	printf("  *      $$$               $$$$$$$$$$       $$$$$$$$$$$       $$        $$$  $$$   $$$    $$        $$       *\n");
+	printf("  *      $$$              $$$$$$$$$$$$       $$$$$$$$$$$      $$        $$$   $$$  $$$    $$        $$       *\n");
+	printf("  **      $$$    $$$$    $$          $$            $$$$      $$$$       $$$    $$$ $$$    $$$      $$$     **\n");
+	printf("   ***     $$$$$$$$$    $$            $$       $   $$$      $$$$$$      $$$     $$$$$$     $$$$$$$$$$    ***\n");
+	printf("     ****    $$$$$     $$              $$       $$$$$      $$$$$$$$     $$$      $$$$$       $$$$$$    ****\n");
+	printf("       **************************************************************************************************\n");
+	printf("          ********************************************************************************************\n");
+	printf("\n                                                     CASINO                                  \n");
+}
+
+void casino(double power[], char  name[])
+{
+	int bah, status = 1, ran;
+	char choice, ch='€';
+
+
+	//get first choice
+	{
+		displaycasino(name);
+		printf("\nCasino' ya hoşgeldin %s.\n", name);
+		printf("Şuanki altının: %.f\n", power[1]);
+		printf("$ R $ Rulet\n");
+		printf("$ İ $ iddaa\n");
+		printf("$ 2 $ 21(Blackjack)\n");
+		printf("- B - Bilgi\n");
+		printf("- Ç - Çıkış\n");
+		do {
+			printf("Seçimini yap: ");
+			scanf(" %c", &choice);
+		} while (choice != 'r' && choice != 'R' && choice != '2' && choice != 'i' && choice != 'b' && choice != 'B' && choice != '‡' && choice != '€' && choice != '˜');
+		printf("\n\n");
+	}
+
+	while (choice != '‡' && choice != '€')
+	{
+		if (choice == 'b' || choice == 'B')
+		{
+			printf("Oyun oynayabilmek için saygınlığının olması gerekir.\n");
+			printf("Risk alarak altın kazanabilirsin.\n");
+			printf("Farklı oyunlar var.\n");
+			printf("Rulette şansın %%50 dir.\n");
+			printf("İddia da risk oranları ve kazançlar farklıdır.\n");
+			printf("Blackjack oynarken elindeki kartları 21'e en yakın yapmaya çalışırsın.\n");
+			printf("Eğer 21 olursa elindeki kartlar kesin olarak kazanırsın.\n");
+			printf("10 a kadar sayılar verilir her el.\n");
+			printf("Eğer elindeki kartların sayısı 21 e yakın değilse\n ve risk almak istersen kart çekebilirsin ama 21' i geçerse kurpiyer kazanır.\n");
+			printf("Kurpiyerde aynı şekilde 21' i gerse kaybeder.\n");
+			printf("Ama kurpiyer en az 17 olması lazımdır. Oyun sonunda kurpiyer elini açar.");
+		}
+		
+		else if (choice=='2')
+		{
+			//check the respect point and hunger
+			if (power[3] < 60)
+				printf("Oyun oynayabilmek için saygın biri olman lazım.");
+			else
+			{
+				//decrease hunger
+				if (power[2] < 10)
+					printf("Açlıktan ölüyorsun!");
+				else
+				{
+					if (power[2] < 3)
+						power[2] = 0;
+					else
+						power[2] -= 3;
+					
+					printf("Sahip olduğun altın miktarı %.f\n", power[1]);
+					do {
+						printf("Ne kadar altın koyuyorsun: ");
+						status = scanf("%d", &bah);
+						if (bah > power[1])
+							printf("Burda çakallara yer yok aslanım, ");
+						if (bah <= 0)
+							printf("Geçersiz, ");
+					} while ((bah <= 0 || bah > power[1]) && status != 0);
+					
+					if (status == 0)
+					{
+						printf("Karakter girdin..\n\n");
+						choice = '‡';
+					}
+					else
+					{
+						int kurpi, player, sumplayer = 0, sumkurpi = 0;
+						printf("\nKağıtlar dağıtıldı.\n");
+						printf("Sana gelen kartlar: \n");
+						printf("-------------------\n");
+						printf("    ");
+
+						for (int i = 1; i <= 2; i++)
+						{
+							player = rand() % ((10 + 1) - 1) + 1;
+							if (i == 1)
+								printf("%d + ", player);
+							else
+								printf("%d = ", player);
+							sumplayer += player;
+						}
+						printf("%d", sumplayer);
+						Sleep(500);
+
+						if (sumplayer == 21)
+						{
+							printf("\n\n       $$$$$$$$$$");
+							printf("\n      $ Blakjack $");
+							printf("\n       $$$$$$$$$$");
+							printf("\n\n%d kadar altın kazandın.\n", bah);
+							power[1] += bah;
+							printf("Saygınlık 10 puan arttı.\n");
+
+							if (power[3] > 90)
+								power[3] = 100;
+							else
+								power[3] += 10;
+						}
+						
+						else
+						{
+							printf("\n-------------------\n");
+							printf("\n- i - iste\n");
+							printf("- k - kal\n");
+							do {
+								printf("Seçimini yap: ");
+								scanf(" %c", &ch);
+								if (ch != 'i' && ch != '˜' && ch != 'k' && ch != 'K')
+									printf("Geçersiz, ");
+							} while (ch != 'i' && ch != '˜' && ch != 'k' && ch != 'K');
+
+							while (ch != 'k' && ch != 'K'&&sumplayer<22)
+							{
+								player = rand() % ((10 + 1) - 1) + 1;
+								printf("-------------------\n");
+								printf("    %d + %d = ", sumplayer,player);
+								sumplayer += player;
+								printf("%d\n", sumplayer);
+								printf("-------------------\n");
+
+								//battı
+								if (sumplayer > 21)
+								{
+									printf("Kaybettin.\nElin 21' i geçti\n");
+									power[1] -= bah;
+
+									printf("Saygınlık 3 puan azaldı.\n");
+
+									if (power[3] < 3)
+										power[3] = 0;
+									else
+										power[3] -= 3;
+									Sleep(500);
+								}
+								else
+								{
+									//update
+									{
+										printf("\n- i - iste\n");
+										printf("- k - kal\n");
+										do {
+											printf("Seçimini yap: ");
+											scanf(" %c", &ch);
+											if (ch != 'i' && ch != '˜' && ch != 'k' && ch != 'K')
+												printf("Geçersiz, ");
+										} while (ch != 'i' && ch != '˜' && ch != 'k' && ch != 'K');
+									}
+								}
+							}
+							
+							if (sumplayer > 21);
+							else
+							{
+								printf("\nSıra kurpiyede\n");
+								printf("Kurpiyere gelen kartlar:\n");
+								printf("-------------------\n");
+								Sleep(500);
+								printf("    ");
+								for (int i = 1; i <= 2; i++)
+								{
+									kurpi = rand() % ((10 + 1) - 1) + 1;
+									if (i == 1)
+										printf("%d + ", kurpi);
+									else
+										printf("%d = ", kurpi);
+									sumkurpi += kurpi;
+								}
+								printf("%d", sumkurpi);
+								printf("\n-------------------\n");
+
+								while (sumkurpi < 17)
+								{
+									printf("\nKurpiyenin eli 17' nin altında oluğu için kart çekiyor.\n");
+									kurpi = rand() % ((10 + 1) - 1) + 1;
+									printf("-------------------\n");
+									printf("    %d + %d = ", sumkurpi, kurpi);
+									sumkurpi+= kurpi;
+									printf("%d\n", sumkurpi);
+									printf("-------------------\n");
+								}
+
+								//result
+								if (sumkurpi > 21)
+								{
+									Sleep(500);
+									printf("\nTebrikler !!!\n");
+									printf("Kurpiyerin eli 21' i geçti.\n");
+									printf("%d altın kazandın.\n", bah);
+									power[1] += bah;
+									printf("Saygınlık 3 puan arttı.\n");
+
+									if (power[3] > 97)
+										power[3] = 100;
+									else
+										power[3] += 3;
+								}
+								else
+									if (sumplayer > sumkurpi)
+									{
+										Sleep(500);
+										printf("\nTebrikler !!!\n");
+										printf("Kurpiyeri geçtin.\n");
+										printf("%d altın kazandın.\n", bah);
+										power[1] += bah;
+										printf("Saygınlık 3 puan arttı.\n");
+
+										if (power[3] > 97)
+											power[3] = 100;
+										else
+											power[3] += 3;
+									}
+
+									else if(sumkurpi > sumplayer)
+									{
+										Sleep(500);
+										printf("\nKaybettin.\n");
+										printf("Kurpiyeri seni geçti.\n");
+										power[1] -= bah;
+
+										printf("Saygınlık 3 puan azaldı.\n");
+
+										if (power[3] < 3)
+											power[3] = 0;
+										else
+											power[3] -= 3;
+									}
+
+									else if (sumkurpi == sumplayer)
+										printf("\nBerabere.\n");
+							}
+						}
+					}
+				}
+			}
+		}
+
+		else if (choice == 'i' || choice == '˜')
+		{
+			//check the respect point and money
+			if (power[3] < 60 || power[1] == 0)
+				printf("Burda oyun oynayabilmek için kumarhanenin saygısını kazanman gerekir.\n");
+			else
+			{
+				//decrease hunger
+				if (power[2] < 10)
+					printf("Açlıktan ölüyorsun!");
+				else
+				{
+					if (power[2] < 3)
+						power[2] = 0;
+					else
+						power[2] -= 3;
+
+					//get the choice
+					{
+						printf("$ F $ Fenerbahçe\n");
+						printf("$ G $ Galatasaray\n");
+						printf("$ B $ Beşiktaş\n");
+						printf("$ K $ Keçiören\n");
+						printf("- İ - Bilgi\n");
+						printf("- Ç - Çıkış\n");
+						do {
+							printf("Seçimini gir: ");
+							scanf(" %c", &ch);
+							if (ch != 'k' && ch != 'K' && ch != 'f' && ch != 'F' && ch != 'g' && ch != 'G' && ch != 'b' && ch != 'B' && ch != 'i' && ch != '˜' && ch != '‡' && ch != '€')
+								printf("Geçersiz, ");
+							printf("\n");
+						} while (ch != 'k' && ch != 'K' && ch != 'f' && ch != 'F' && ch != 'g' && ch != 'G' && ch != 'b' && ch != 'B' && ch != 'i' && ch != '˜' && ch != '‡' && ch != '€');
+
+						if (ch == 'i' || ch == '˜')
+						{
+							printf("Takımların kazanma oranları ve dolayısıyla da kazanç oranların farklıdır.\n");
+							printf("Fenerbahçe'nin kazanma oranı %%80 dir\n\n");
+							printf("Kar oranı bahse koyduğun paranın %%20' si dir.\n");
+							printf("----------------------------------------------\n");
+							printf("Galatasaray'ın kazanma oranı %%60 tır.\n");
+							printf("Kar oranı bahse koyduğun paranın %%40' ı dır.\n");
+							printf("----------------------------------------------\n");
+							printf("Beşiktaş' ın kazanma oranı %%40 dır.\n");
+							printf("Kar oranı koyduğun paranın %%160' si dir\n");
+							printf("----------------------------------------------\n");
+							printf("Keçiörengücü' nün kazanma oranı %%30 dur.\n");
+							printf("Kar oranı %%200' dür.");
+						}
+
+						else if (ch != '‡' && ch != '€')
+						{
+							if (ch == 'f' || choice == 'F')
+							{
+								printf("\nŞuanki altının: %.f\n", power[1]);
+								printf("Fenerbahçe'ye ne kadar yatırmak istersin: ");
+								do {
+									status = scanf("%d", &bah);
+									if (bah <= 0 && status != 0)
+										printf("Geçersiz miktar, tekrar gir: ");
+									else if (bah > power[1] && status != 0)
+										printf("Burda çakallık işe yaramaz aslanım, tekrar gir: ");
+								} while (status != 0 && bah <= 0 || bah > power[1]);
+
+								if (status == 0)
+									printf("Karakter girdin.\n\n");
+								else
+								{
+									Sleep(1000);
+									//generate random number and check 
+
+									ran = rand() % ((10 + 1) - 1) + 1;
+									if (ran > 2)
+									{
+										printf("\nTebrikler !!!\n");
+										printf("Fenerbahçe kazandı.\n");
+										printf("%d altın kazandın.\n", int(ceil((double)bah * 20 / 100)));
+										power[1] += int(ceil((double)bah * 20 / 100));
+										printf("Saygınlığın 3 arttı.\n");
+										if (power[3] > 97)
+											power[3] = 100;
+										else
+											power[3] += 3;
+									}
+
+									else
+									{
+										printf("\nFenerbahçe kaybetti.\n");
+										printf("Saygınlığın 3 azaldı.\n");
+										power[1] -= bah;
+										if (power[3] < 3)
+											power[3] = 0;
+										else
+											power[3] -= 3;
+									}
+								}
+							}
+
+							else if (ch == 'g' || choice == 'G')
+							{
+								printf("\nŞuanki altının: %.f\n", power[1]);
+								printf("Galatasaray'a ne kadar yatırmak istersin: ");
+								do {
+									status = scanf("%d", &bah);
+									if (bah <= 0 && status != 0)
+										printf("Geçersiz miktar, tekrar gir: ");
+									else if (bah > power[1] && status != 0)
+										printf("Burda çakallık işe yaramaz aslanım, tekrar gir: ");
+								} while (status != 0 && bah <= 0 || bah > power[1]);
+
+								if (status == 0)
+									printf("Karakter girdin.\n\n");
+								else
+								{
+									Sleep(1000);
+									//generate random number and check 
+
+									ran = rand() % ((10 + 1) - 1) + 1;
+									if (ran > 4)
+									{
+										printf("\nTebrikler !!!\n");
+										printf("Galatasaray kazandı.\n");
+										printf("%d altın kazandın.\n", int(ceil((double)bah * 40 / 100)));
+										power[1] += int(ceil((double)bah * 40 / 100));
+										printf("Saygınlığın 3 arttı.\n");
+										if (power[3] > 97)
+											power[3] = 100;
+										else
+											power[3] += 3;
+									}
+
+									else
+									{
+										printf("Galatasaray kaybetti.\n");
+										printf("Saygınlığın 3 azaldı.\n");
+										power[1] -= bah;
+										if (power[3] < 3)
+											power[3] = 0;
+										else
+											power[3] -= 3;
+									}
+								}
+							}
+
+							else if (ch == 'b' || choice == 'B')
+							{
+								printf("\nŞuanki altının: %.f\n", power[1]);
+								printf("Beşiktaş'a ne kadar yatırmak istersin: ");
+								do {
+									status = scanf("%d", &bah);
+									if (bah <= 0 && status != 0)
+										printf("Geçersiz miktar, tekrar gir: ");
+									else if (bah > power[1] && status != 0)
+										printf("Burda çakallık işe yaramaz aslanım, tekrar gir: ");
+								} while (status != 0 && bah <= 0 || bah > power[1]);
+
+								if (status == 0)
+									printf("Karakter girdin.\n\n");
+								else
+								{
+									Sleep(1000);
+									//generate random number and check 
+
+									ran = rand() % ((10 + 1) - 1) + 1;
+									if (ran > 6)
+									{
+										printf("\nTebrikler !!!\n");
+										printf("Beşiktaş kazandı.\n");
+										printf("%d altın kazandın.\n", int(ceil((double)bah * 160 / 100)));
+										power[1] += int(ceil((double)bah * 160 / 100));
+										printf("Saygınlığın 3 arttı.\n");
+										if (power[3] > 97)
+											power[3] = 100;
+										else
+											power[3] += 3;
+									}
+
+									else
+									{
+										printf("\nBeşiktaş kaybetti.\n");
+										printf("Saygınlığın 3 azaldı.\n");
+										power[1] -= bah;
+										if (power[3] < 3)
+											power[3] = 0;
+										else
+											power[3] -= 3;
+									}
+								}
+							}
+
+							else if (ch == 'k' || choice == 'K')
+							{
+								printf("\nŞuanki altının: %.f\n", power[1]);
+								printf("Keçiören'a ne kadar yatırmak istersin: ");
+								do {
+									status = scanf("%d", &bah);
+									if (bah <= 0 && status != 0)
+										printf("Geçersiz miktar, tekrar gir: ");
+									else if (bah > power[1] && status != 0)
+										printf("Burda çakallık işe yaramaz aslanım, tekrar gir: ");
+								} while (status != 0 && bah <= 0 || bah > power[1]);
+
+								if (status == 0)
+									printf("Karakter girdin.\n\n");
+								else
+								{
+									//generate random number and check 
+									ran = rand() % ((10 + 1) - 1) + 1;
+									if (ran > 7)
+									{
+										printf("\nTebrikler !!!\n");
+										printf("Keçiören kazandı.\n");
+										printf("%d altın kazandın.\n", int(ceil((double)bah * 200 / 100)));
+										power[1] += int(ceil((double)bah * 200 / 100));
+										printf("Saygınlığın 3 arttı.\n");
+										if (power[3] > 97)
+											power[3] = 100;
+										else
+											power[3] += 3;
+									}
+									else
+									{
+										printf("\nKeçiören kaybetti.\n");
+										printf("Saygınlığın 3 azaldı.\n");
+										power[1] -= bah;
+										if (power[3] < 3)
+											power[3] = 0;
+										else
+											power[3] -= 3;
+									}
+								}
+							}
+						}
+						else;
+					}
+				}
+			}
+		}
+
+		else if (choice == 'R' || choice == 'r')
+		{
+			//check the respect point and money
+			if (power[3] < 60 || power[1] == 0)
+				printf("Burda oyun oynayabilmek için kumarhanenin saygısını kazanman gerekir.\n");
+			else
+			{
+				//decrease hunger
+				if (power[2] < 10)
+					printf("Açlıktan ölüyorsun!");
+				else
+				{
+					if (power[2] < 3)
+						power[2] = 0;
+					else
+						power[2] -= 3;
+
+					//get choice
+					{
+						printf("$ K $ Kırmızı\n");
+						printf("$ S $ Siyah\n");
+						printf("- Ç - Çıkış\n");
+						do {
+							printf("Seçimini yap:");
+							scanf(" %c", &ch);
+							if (ch != 'k' && ch != 'K' && ch != 's' && ch != 'S' && ch != '‡' && ch != '€')
+								printf("Geçersiz, ");
+						} while (ch != 'k' && ch != 'K' && ch != 's' && ch != 'S' && ch != '‡' && ch != '€');
+					}
+				}
+
+				if (ch != '‡' && ch != '€')
+				{
+					//get the money and check it
+					printf("\nŞuanki altının: %.f\n", power[1]);
+					do
+					{
+						printf("Ne kadar para koyuyorsun: ");
+						status = scanf("%d", &bah);
+						if (bah <= 0)
+							printf("Geçersiz miktar, ");
+						if (bah > power[1])
+							printf("Kurnazlık yapma, ");
+					} while (bah <= 0 || bah > power[1] && status != 0);
+
+					//check the bet
+					if (status == 0)
+						printf("Karakter girdin!");
+					else
+					{
+						ran = rand() % ((10 + 1) - 1) + 1;
+
+						//display the output
+						{
+							Sleep(1000);
+							if (ch == 'k' || ch == 'K')
+								if (ran % 2 == 0)
+								{
+									printf("\nTebrikler!!\n");
+									printf("%d altın kazandın.\n", bah);
+									power[1] += bah;
+									printf("Saygı puanın 3 arttı.\n");
+									if (power[3] > 97)
+										power[3] = 100;
+									else
+										power[3] += 3;
+								}
+								else
+								{
+									printf("\nKaybettin\n");
+									printf("Siyah çıktı.\n");
+									printf("Saygı puanın 3 azaldı.\n");
+									power[1] -= bah;
+									if (power[3] >= 3)
+										power[3] -= 3;
+									else
+										power[3] = 0;
+								}
+							else
+								if (ran % 2 == 0)
+								{
+									printf("\nKaybettin.\n");
+									printf("Kırmızı çıktı.\n");
+									printf("Saygı puanın 3 azaldı.\n");
+									power[1] -= bah;
+									if (power[3] >= 3)
+										power[3] -= 3;
+									else
+										power[3] = 0;
+								}
+								else
+								{
+									printf("\nTebrikler!!\n");
+									printf("%d altın kazandın.\n", bah);
+									power[1] += bah;
+									printf("Saygı puanın 3 arttı.\n");
+									if (power[3] > 97)
+										power[3] = 100;
+									else
+										power[3] += 3;
+								}
+						}
+					}
+				}
+				else;
+			}
+		}
+
+		//update
+		if (status != 0)
+		{
+			printf("\n\n>>>>>>>>>>>>>");
+			printf("\nŞuanki altının: %.f", power[1]);
+			printf("\n$ R $ Rulet\n");
+			printf("$ İ $ İddaa\n");
+			printf("$ 2 $ 21(Blackjack)\n");
+			printf("- B - Bilgi\n");
+			printf("- Ç - Çıkış\n");
+			do {
+				printf("Seçimini yap: ");
+				scanf(" %c", &choice);
+				if (choice != 'r' && choice != 'R' && choice != '2' && choice != 'i' && choice != 'b' && choice != 'B' && choice != '‡' && choice != '€' && choice != '˜')
+					printf("Geçersiz, ");
+			} while (choice != 'r' && choice != 'R' && choice != '2' && choice != 'i' && choice != 'b' && choice != 'B' && choice != '‡' && choice != '€' && choice != '˜');
+			printf("\n\n");
+		}
+	}
+	displaytree(name);
+}
+
+void towninformation(void)
+{
+	printf("\nBurda çeşitli seçeneklere sahipsin ihtiyacına göre gitmen gereken yere git.\n");
+	printf("Arena - Savaşarak level atlayabilirsin böylelikle gücünü arttırabilirsin.\n");
+	printf("Yemekhane - Acıktığın zaman beslenmen gerekiyor yoksa yapabileceğin şeyler sınırlanır.\n");
+	printf("Ayrıca yemekhanede ziyafet vererek saygınlığını arttırabilirsin.\n");
+	printf("Dükkan - Zırh ve kılıç alarak güçlenebileceğin yer.\n");
+	printf("Spor - Kaslarını zorlayarak gücünü arttırabilirsin. Dikkat et fazla yüklenme.\n");
+	printf("Görevler - Para kazanmak için eğlenceli seçenekler var.\n");
+	printf("Casino - Çeşitli oyunlarla paranı katlayabilirsin.\n");
+	printf("Kasabadan atılmak istemiyorsan saygınlığında dikkat et. Pek misafirperver değil burdakiler.\n");
+	printf("Canına ve parana dikkat et, çakalların olduğu bu kasabada dar sokaklardan geçerken götü kolla..\n");
+	printf("OYUNU KAYDETMEYİ UNUTMA !!!!!!\n\n");
+}
+
+void duties(double power[], char  name[])
+{
+	char choice;
+	int password[2][5], pw, status = 1, turn, pww, digit, r;
+
+	//get choice
+	{
+		printf("\n\n\n");
+		printf("**********************************\n");
+		printf("Yeraltına hoşgeldin %s.\n", name);
+		printf("- K - Kasa şifresi kırma\n");
+		printf("- İ - İstihbarat saldırısı\n");
+		printf("- B - Bilgi\n");
+		printf("- Ç - Çıkış\n");
+		do
+		{
+			printf("Seçimini yap: ");
+			scanf(" %c", &choice);
+			if (choice != 'k' && choice != 'K' && choice != 'i' && choice != '˜' && choice != 'b' && choice != 'B' && choice != '‡' && choice != '€')
+				printf("Geçersiz, ");
+		} while (choice != 'k' && choice != 'K' && choice != 'i' && choice != '˜' && choice != 'b' && choice != 'B' && choice != '‡' && choice != '€');
+	}
+
+	while (choice != '‡' && choice != '€')
+	{
+
+		if (choice == 'b' || choice == 'B')
+		{
+			printf("\n\nBurda görevleri yaparak altın kazanabilirsin.\n");
+			printf("Şuanki altının: %.f\n", power[1]);
+			printf("Kasa şifresi için 5 basamaklı bir şifreyi deneyerek kırmaya çalışırsın.\n");
+			printf("İstihbarat saldırısında kralın telefon konuşmasında geçen kelimeleri kodlara göre çözümleyip satarsın.\n\n");
+		}
+
+		else if (choice == 'i' || choice == '˜')
+		{
+			int word[10];
+
+			//decrease hunger
+			{
+				if (power[2] > 10)
+					power[2] -= 10;
+				else
+					power[2] = 0;
+			}
+
+			printf("\nBurda sana verilen tabloya göre şifrelenmiş olan konuşmanın harlerini yazman lazım.\n");
+			printf("İşte tablo\n------------>\n");
+			//small letters
+			{
+				r = int('a');
+				for (int c = 1; c <= 6; c++)
+				{
+					for (int i = 0; i <= 4; i++)
+					{
+						if (r <= int('z'))
+							printf("%c = %3d || ", char(r), r);
+						r++;
+					}
+					printf("\n");
+				}
+				printf("\n");
+			}
+
+			//generate random numbers , display , get, check the input
+			{
+				for (int z = 0; z < 10; z++)
+					word[z] = rand() % ((122 + 1) - 97) + 97;
+
+				{
+					printf("\nAralarında boşluk bırakarak sayılara karşılık gelen harfleri yaz.\n               ");
+					printf("\n              ");
+					for (int z = 0; z < 7; z++)
+						printf("%3d ", int(word[z]));
+					printf("\n               ");
+
+					char wo[10];
+					for (int z = 0; z < 7; z++)
+						scanf(" %c", &wo[z]);
+
+
+					int sum = 0;
+					for (int z = 0; z < 7; z++)
+						if (word[z] == int(wo[z]))
+							sum++;
+
+					if (sum == 7)
+					{
+						printf("\nKablolardan çaldığın sözcükleri başarıyla ilettin.\n");
+
+						if (power[0] > 0 && power[0] <= 30)
+						{
+							printf("Ödül olarak 2000 altın kazandın.\n\n");
+							power[1] += 2000;
+						}
+						else if (power[0] > 30 && power[0] <= 50)
+						{
+							printf("Ödül olarak 5000 altın kazandın.\n\n");
+							power[1] += 5000;
+						}
+						else if (power[0] > 50 && power[0] <= 70)
+						{
+							printf("Ödül olarak 10000 altın kazandın.\n\n");
+							power[1] += 10000;
+						}
+						else
+						{
+							printf("Ödül olarak 20000 altın kazandın.\n\n");
+							power[1] += 20000;
+						}						
+					}
+					else
+						printf("\nÇaldığın kelimeleri doğru iletemedin.\n\n");
+				}
+			}
+		}
+
+		else if (choice == 'k' || choice == 'K')
+		{
+			//decrease hunger
+			{
+				if (power[2] > 5)
+					power[2] -= 5;
+				else
+					power[2] = 5;
+			}
+
+			//generate the random password
+			{
+				for (int i = 0; i < 5; i++)
+					password[0][i] = rand() % ((9 + 1) - 1) + 1;
+			}
+
+			//get the guess
+			{
+				printf("\n------------\n");
+				do {
+					printf("Şifreyi gir: ");
+					status = scanf("%d", &pw);
+
+					if (status == 0)
+						digit = 5;
+					else
+					{
+						//count the digits
+						{
+							digit = 0;
+							pww = pw;
+
+							while (pww != 0)
+							{
+								pww /= 10;
+								digit++;
+							}
+						}
+					}
+
+					if (digit != 5)
+						printf("%d haneli girdin, 5 haneli ", digit);
+				} while (digit != 5);
+
+				if (status == 0)
+					pw = -1;
+				else
+					for (int i = 4; i >= 0; i--)
+					{
+						password[1][i] = pw % 10;
+						pw /= 10;
+					}
+				turn = 1;
+			}
+
+			//display the message
+			{
+				while (!(password[0][0] == password[1][0] && password[0][1] == password[1][1] && password[0][2] == password[1][2] && password[0][3] == password[1][3] && password[0][4] == password[1][4] || password[1][4] == -1 || turn == 8 || status == 0))
+				{
+					//display message 
+					{
+						printf("\n %d deneme hakkın kaldı.\n", 8 - turn);
+						turn++;
+
+						printf("  ");
+						for (int i = 0; i < 5; i++)
+							if (password[0][i] == password[1][i])
+								printf("%d  ", password[1][i]);
+							else printf("   ");
+
+						printf("\n  -  -  -  -  -");
+					}
+
+					//update
+					{
+						printf("\n\n");
+						do {
+							printf("Şifreyi gir: ");
+							status = scanf("%d", &pw);
+
+							if (status == 0)
+								digit = 5;
+							else
+							{
+								//count the digits
+								{
+									digit = 0;
+									pww = pw;
+
+									while (pww != 0)
+									{
+										pww /= 10;
+										digit++;
+									}
+								}
+							}
+
+							if (digit != 5)
+								printf("%d haneli girdin, 5 haneli ", digit);
+						} while (digit != 5);
+
+						if (status == 0)
+							pw = -1;
+						else
+							for (int i = 4; i >= 0; i--)
+							{
+								password[1][i] = pw % 10;
+								pw /= 10;
+							}
+					}
+				}
+				if (password[0][0] == password[1][0] && password[0][1] == password[1][1] && password[0][2] == password[1][2] && password[0][3] == password[1][3] && password[0][4] == password[1][4])
+				{
+					printf("\n\n>>>>>>>>>>>>>>>>>>>\nTebrikler şifreyi çözmeyi başardın.\n20000 altın kazandın.\nSaygınlığın 10 arttı\n>>>>>>>>>>>>>>>>>>>\n\n");
+					power[1] += 20000;
+					if (power[3] <= 90)
+						power[3] += 10;
+					else
+						power[3] = 100;
+				}
+
+				else if (turn == 8)
+				{
+					printf("\nKasayı patlatamadın.\n");
+					printf("Polisler yakaladı kasabaya paketlediler.\n");
+					printf("Saygınlığın 5 azaldı.\n\n");
+					if (power[3] > 5)
+						power[3] -= 5;
+					else
+						power[3] = 0;
+				}
+
+				else if (status == 0)
+				{
+					printf("\nKarakter girdin..");
+					printf("\nKasayı patlatamadın.\n");
+					printf("Polisler yakaladı kasabaya paketlediler.\n");
+					printf("Saygınlığın 15 azaldı.\n\n");
+					if (power[3] > 5)
+						power[3] -= 5;
+					else
+						power[3] = 0;
+				}
+
+				else if (password[1][4] == -1)
+				{
+					printf("\nKasayı bırakıp tüydün.\n");
+					printf("Bu davranışından dolayı saygınlığını 15 kaybettin.\n\n");
+					if (power[3] > 10)
+						power[3] -= 15;
+					else
+						power[3] = 0;
+				}
+			}
+		}
+
+		//update
+		printf("\n**********************************\n");
+		printf("- K - Kasa şifresi kırma\n");
+		printf("- İ - İstihbarat saldırısı\n");
+		printf("- B - Bilgi\n");
+		printf("- Ç - Çıkış\n");
+		do
+		{
+			printf("Seçimini yap: ");
+			scanf(" %c", &choice);
+			if (choice != 'k' && choice != 'K' && choice != 'i' && choice != '˜' && choice != 'b' && choice != 'B' && choice != '‡' && choice != '€')
+				printf("Geçersiz, ");
+		} while (choice != 'k' && choice != 'K' && choice != 'i' && choice != '˜' && choice != 'b' && choice != 'B' && choice != '‡' && choice != '€');
+	}
+	printf("\n\n");
+	displaytree(name);
+}
+
+void spor(double power[], char name[], double gold[])
+{
+	int possib;
+	char ch;
+
+	//get choice and step into while loop
+	printf("\n\n**********\n");
+	printf("Açlık: %.0f\nAltın: %.f\n", power[2], power[1]);
+	printf("- H - Hafif antreman %.f altın\n", gold[0]);
+	printf("- A - Ağır antreman %.f altın\n", gold[1]);
+	printf("- i - Bilgi\n");
+	printf("- Ç - Çık\n");
+	do {
+		printf("Seçimini yap: ");
+		scanf(" %c", &ch);
+		if (ch != 'h' && ch != 'H' && ch != 'a' && ch != 'A' && ch != 'i' && ch != '˜' && ch != '‡' && ch != '€')
+			printf("Geçersiz, ");
+	} while (ch != 'h' && ch != 'H' && ch != 'a' && ch != 'A' && ch != 'i' && ch != '˜' && ch != '‡' && ch != '€');
+
+	//check respect
+	if (power[3] < 20)
+	{
+		printf("Saygısızlığın lüzumu yok!\n\n\n");
+		displaytree(name);
+	}
+	else
+	{
+		while (ch != '‡' && ch != '€')
+		{
+			//perform
+			if (ch == 'i' || ch == '˜')
+			{
+				printf("\nAçlık: %f.0\n", power[2]);
+				printf("Spor yaparak gücünü arttırabilirsin.\n");
+				printf("Hafif antreman gücünü 1 arttırırken ağır antreman 2 arttırır.\n");
+				printf("Ağır antremanda sakatlanma şansın daha yüksektir.\n");
+				printf("Spor yaparken fazla enerji tüketirsin, açlığına dikkat et bayılma.\n\n");
+			}
+			else
+			{
+				//açlık varsa dön
+				if (power[2] < 20)
+				{
+					power[3] -= 10;
+					ch = '€';
+					printf("Şekerin düştü. Kasabaya zar zor döndün. Saygınlık 10 puan azaldı.\n\n\n");
+				}
+
+				else
+				{
+					possib = rand() % ((10 + 1) - 1) + 1;
+
+					//ağır antreman
+					if (ch == 'a' || ch == 'A')
+					{
+						if (power[1] < round(gold[1]))
+							printf("\nYeterli altının yok!\n\n");
+						else
+						{
+							power[2] -= 15;
+							power[1] -= round(gold[1]);
+				
+							if (possib == 3 || possib == 5 || possib == 7 || possib == 9)
+							{
+								printf("\nFazla yüklendin, gelişme gösteremedin.\n\n");
+								Sleep(1000);
+							}
+							else
+							{
+								if (possib >= 0 && possib <= 2)
+								{
+									power[4] += round(power[4] * 10 / 100 + 2);
+									printf("\nBaşarıyla tamamladın.");
+									printf("\nToplam can %.0f puan arttı.\n", round(power[5] * 10 / 100 + 2));
+								}
+								else if (possib <= 4)
+								{
+									power[5] += round(power[5] * 10 / 100 + 2);
+									printf("\nBaşarıyla tamamladın.");
+									printf("\nAtak %.0f puan arttı.\n", round(power[5] * 10 / 100 + 2));
+								}
+								else if (possib <= 8)
+								{
+									power[6] += round(power[6] * 10 / 100 + 2);
+									printf("\nBaşarıyla tamamladın.");
+									printf("\nDefans %.0f puan arttı.\n", round(power[5] * 10 / 100 + 2));
+								}
+								else if (possib <= 10)
+								{
+									power[7] += round(power[7] * 10 / 100 + 2);
+									printf("\nBaşarıyla tamamladın.");
+									printf("\nKritik %.0f puan arttı.\n", round(power[7] * 10 / 100 + 2));
+								}
+								Sleep(1000);
+
+								//increase price
+								gold[1] += gold[1] * 5 / 100;
+							}
+						}
+					}
+
+					//hafif antreman
+					else
+					{
+						if (power[1] < round(gold[0]))
+							printf("\nYeterli altının yok!\n\n");
+						else
+						{
+							power[2] -= 10;
+							power[1] -= round(gold[0]);
+							if (possib == 7 || possib == 9)
+							{
+								printf("\nFazla yüklendin, gelişme gösteremedin.\n\n");
+								Sleep(1000);
+							}
+							else
+							{
+								if (possib >= 0 && possib <= 2)
+								{
+									power[4] += round(power[4] * 10 / 100 + 2);
+									printf("\nBaşarıyla tamamladın.");
+									printf("\nToplam can %.0f puan arttı.\n", round(power[5] * 10 / 100 + 2));
+								}
+								else if (possib <= 4)
+								{
+									power[5] += round(power[5] * 10 / 100 + 2);
+									printf("\nBaşarıyla tamamladın.");
+									printf("\nAtak %.0f puan arttı.\n", round(power[5] * 10 / 100 + 2));
+								}
+								else if (possib <= 7)
+								{
+									power[6] += round(power[6] * 10 / 100 + 2);
+									printf("\nBaşarıyla tamamladın.");
+									printf("\nDefans %.0f puan arttı.\n", round(power[5] * 10 / 100 + 2));
+								}
+								else if (possib <= 10)
+								{
+									power[7] += round(power[5] * 10 / 100 + 2);
+									printf("\nBaşarıyla tamamladın.");
+									printf("\nKritik %.0f puan arttı.\n", round(power[5] * 10 / 100 + 2));
+								}
+								Sleep(1000);
+
+								//increase price
+								gold[0] += gold[0] * 5 / 100;
+							}
+						}
+					}
+				}
+			}
+
+			if (ch != '€')
+			{
+				//update
+				printf("\n\n**********\n");
+				printf("Açlık: %.0f\nAltın: %.f\n", power[2], power[1]);
+				printf("- H - Hafif antreman %.f altın\n", gold[0]);
+				printf("- A - Ağır antreman %.f altın\n", gold[1]);
+				printf("- i - Bilgi\n");
+				printf("- Ç - Çık\n");
+				do {
+					printf("Seçimini yap: ");
+					scanf(" %c", &ch);
+					if (ch != 'h' && ch != 'H' && ch != 'a' && ch != 'A' && ch != 'i' && ch != 'İ' && ch != '‡' && ch != '€')
+						printf("Geçersiz, ");
+				} while (ch != 'h' && ch != 'H' && ch != 'a' && ch != 'A' && ch != 'i' && ch != '˜' && ch != '‡' && ch != '€');
+			}
+		}
+		printf("\n\n");
+	}
+	displaytree(name);
+}
+
+void store(double power[], double gold[], char name[])
+{
+	char choice;
+
+	//check the respect
+	if (power[3] < 50)
+	{
+		printf("\n\nAnlaşılan bu dükkan saygısızlara herhangi bir şey satmıyor..\n");
+	}
+	else
+	{
+		//get choice
+		{
+			printf("\n\n************************");
+			printf("\nDükkana hoş geldin.");
+			printf("\nAltın: %.f", power[1]);
+			printf("\n- K - Kılıç - %.f altın", gold[2]);
+			printf("\n- Z - Zırh - %.f altın", gold[3]);
+			printf("\n- İ - İksir - %.f altın", gold[4]);
+			printf("\n- Ç - Çıkış");
+			printf("\n- B - Bilgi\n");
+			do {
+				printf("Seçimini yap: ");
+				scanf(" %c", &choice);
+				if (choice != '˜' && choice != 'i' && choice != 'k' && choice != 'K' && choice != 'z' && choice != 'Z' && choice != 'b' && choice != 'B' && choice != '‡' && choice != '€')
+					printf("Geçersiz, ");
+			} while (choice != '˜' && choice != 'i' && choice != 'k' && choice != 'K' && choice != 'z' && choice != 'Z' && choice != 'b' && choice != 'B' && choice != '‡' && choice != '€');
+		}
+
+		while (choice != '‡' && choice != '€')
+		{
+			if (choice == 'b' || choice == 'B')
+			{
+				printf("\n****************************************");
+				printf("\nDükkandan alışveriş yaparak güçlenirsin.\n");
+				printf("Kılıç atak puanını ve kritiğini, zırh defansını ve canını arttırır.\n");
+				printf("Bu kasabadaki iksirlere güveniyor musun?\n\n");
+			}
+
+			else if (choice == 'i' || choice == '˜')
+			{
+				if (power[1] < round(gold[4]))
+					printf("\nYeterli altına sahip değilsin.\n");
+				else
+				{
+
+					//decrease hunger
+					if (power[2] < 10)
+						power[2] = 0;
+					else
+						power[2] -= 10;
+
+					//decrease gold
+					power[1] -= round(gold[4]);
+
+					//increase statistics
+					{
+						int possib;
+
+						//generate the possibility
+						possib = rand() % ((10 + 1) - 1) + 1;
+						
+						if (possib <= 3)
+						{
+							//def
+							power[4] += power[4] * 10 / 100 + 2;
+							power[6] += power[6] * 10 / 100 + 2;
+							
+							printf("\nŞanlı çıktın, iksir gücünü arttırdı.");
+
+							//increase price
+							gold[4] += gold[4] * 5 / 100;
+						}
+
+						else if (possib <= 6)
+						{
+							//atk
+							power[5] += power[5] * 10 / 100 + 2;
+							power[7] += power[7] * 10 / 100 + 2;
+
+							//display the message
+							printf("\nŞanlı çıktın, iksir gücünü arttırdı.");
+							Sleep(500);
+
+							//increase price
+							gold[4] += gold[4] * 5 / 100;
+						}
+						
+						else
+						{
+							printf("\nZehirlendin.\nKöpürdüğün için saygın düştü.");
+							Sleep(500);
+
+							//decrease respect
+							if (power[3] < 10)
+								power[3] = 0;
+							else
+								power[3] -= 3;
+						}
+					}
+				}
+			}
+
+			else if (choice == 'z' || choice == 'Z')
+			{
+				if (power[1] < round(gold[3]))
+					printf("\nYeterli altına sahip değilsin.\n");
+				else
+				{
+
+					//decrease hunger
+					if (power[2] < 10)
+						power[2] = 0;
+					else
+						power[2] -= 10;
+
+					//decrease gold	
+					power[1] -= round(gold[3]);
+
+					//increase statistics
+					power[4] += power[4] * 10 / 100 + 2;
+					power[6] += power[6] * 10 / 100 + 2;
+
+					if (power[4] > 100 && power[4] <= 200)
+						power[4] += 10;
+					else if (power[4] > 200 && power[4] <= 300)
+						power[4] += 20;
+					else if (power[4] > 300 && power[4] <= 400)
+						power[4] += 31;
+					//500 den fazla yaparsan 5000 i değiştir
+					else if (power[4] > 400 && power[4] <= 5000)
+						power[4] += 50;
+
+
+					//increase price
+					gold[3] += gold[3] * 5 / 100;
+
+					//display the message
+					printf("\nYeni zırhı aldın.\n");
+					printf("Gücün arttı.");
+					Sleep(500);
+				}
+			}
+
+			else if (choice == 'k' || choice == 'K')
+			{
+				if (power[1] < round(gold[2]))
+					printf("\nYeterli altına sahip değilsin.\n");
+				else
+				{
+
+					//decrease hunger
+					if (power[2] < 10)
+						power[2] = 0;
+					else
+						power[2] -= 10;
+
+					//decrease gold
+					power[1] -= round(gold[2]);
+
+					//increase statistics
+					power[5] += power[5] * 10 / 100 + 2;
+					power[7] += power[7] * 10 / 100 + 2;
+
+					if (power[5] > 100 && power[5] <= 200)
+						power[5] += 10;
+					else if (power[5] > 200 && power[5] <= 300)
+						power[5] += 20;
+					else if (power[5] > 300 && power[5] <= 400)
+						power[5] += 31;
+					//500 den fazla yaparsan 5000 i değiştir
+					else if (power[5] > 400 && power[5] <= 5000)
+						power[5] += 200;
+
+
+					//increase price
+					gold[2] += gold[2] * 5 / 100;
+
+					//display the message
+					printf("\nYeni kılıcı aldın.\n");
+					printf("Gücün arttı.");
+					Sleep(500);
+				}
+			}
+
+			//update
+			{
+				printf("\n\n************************");
+				printf("\nAltın: %.f", power[1]);
+				printf("\n- K - Kılıç - %.f altın", gold[2]);
+				printf("\n- Z - Zırh - %.f altın", gold[3]);
+				printf("\n- İ - İksir - %.f altın", gold[4]);
+				printf("\n- Ç - Çıkış");
+				printf("\n- B - Bilgi\n");
+				do {
+					printf("Seçimini yap: ");
+					scanf(" %c", &choice);
+					if (choice != '˜' && choice != 'i' && choice != 'k' && choice != 'K' && choice != 'z' && choice != 'Z' && choice != 'b' && choice != 'B' && choice != '‡' && choice != '€')
+						printf("Geçersiz, ");
+				} while (choice != '˜' && choice != 'i' && choice != 'k' && choice != 'K' && choice != 'z' && choice != 'Z' && choice != 'b' && choice != 'B' && choice != '‡' && choice != '€');
+			}
+		}
+
+	}
+	printf("\n\n");
+	displaytree(name);
+}
+
+void townstat(double power[])
+{
+	printf("            *****************************************************************\n");
+	printf("            *Level   Altın   Açlık   Saygı   Can     Atak    Defans   Kritik*\n");
+	printf("            *-----   -----   -----   -----   -----   -----   ------   ------*\n");
+	printf("            *%5d%8.f%8.f%8.f%8.f%8.f%9.f%9.f*\n", int(power[0] / 10), power[1], power[2], power[3], power[4], power[5], power[6], power[7]);
+	printf("            *****************************************************************\n");
+}
+
+void food(double power[], char name[])
+{
+	char choice;
+
+	printf("\n\nYemekhaneye hoşgeldin.\n");
+	//get choice
+	{
+		printf("- Z - Ziyafet\n");
+		printf("- P - Patates\n");
+		printf("- E - Ev yemekleri\n");
+		printf("- M - Mantar\n");
+		printf("- Ç - Çıkış\n");
+		printf("- i - Bilgi\n");
+		do {
+			printf("Hangi menüyü istiyorsun: ");
+			scanf(" %c", &choice);
+			if (choice != '‡' && choice != '€' && choice != 'E' && choice != 'e' && choice != 'p' && choice != 'P' && choice != 'M' && choice != 'm' && choice != 'i' && choice != '˜' && choice != 'z' && choice != 'Z')
+				printf("Geçersiz, ");
+		} while (choice != '‡' && choice != '€' && choice != 'E' && choice != 'e' && choice != 'p' && choice != 'P' && choice != 'M' && choice != 'm' && choice != 'i' && choice != '˜' && choice != 'z' && choice != 'Z');
+	}
+
+	while (choice != '‡' && choice != '€')
+	{
+		if (choice == 'i' || choice == '˜')
+		{
+			printf("\nZiyafet çekmek saygınlığını 40 arttır, karnını tamamen doyurur. 100 altın\n");
+			printf("Patates her zamanki gibi en lezettli yemek, açlığının yarısını giderir. 50 altın\n");
+			printf("Ev yemekleri çeşitli olmasada karnını biraz doyurabilirsin. 30 altın\n");
+			printf("Mantarı seçiyorsan şansını denemek zorundasın. Kimse sonuçlarını bilmiyor. 20 altın\n\n");
+		}
+
+		else if (choice == 'p' || choice == 'P')
+		{
+			//gold
+			if (power[1] < 50)
+			{
+				printf("\n*****************************\n");
+				printf("Paran yetersiz, biraz çalış.\n\n");
+			}
+			else
+			{
+
+				power[1] -= 50;
+
+				//hunger
+				{
+					if (power[2] >= 50)
+						power[2] = 100;
+					else
+						power[2] += 50;
+				}
+
+				//message
+				{
+					printf("\n*****************************\n");
+					printf("Patates kızarması gibisi yok.\n");
+					printf("Açlık %.f'e yükseldi.\n\n", power[2]);
+				}
+			}
+		}
+
+		else if (choice == 'e' || choice == 'E')
+		{
+			//gold
+			if (power[1] < 30)
+			{
+				printf("\n*****************************\n");
+				printf("Paran yetersiz, biraz çalış.\n\n");
+			}
+			else
+			{
+				power[1] -= 30;
+
+				//hunger
+				{
+					if (power[2] >= 70)
+						power[2] = 100;
+					else
+						power[2] += 30;
+				}
+
+				//message
+				printf("\n*********************\nAfiyet olsun.");
+				printf("\nAçlık %.f'e yükseldi.\n\n", power[2]);
+			}
+		}
+
+		else if (choice == 'z' || choice == 'Z')
+		{
+			//gold
+			if (power[1] < 100)
+			{
+				printf("\n*****************************\n");
+				printf("Paran yetersiz, biraz çalış.\n\n");
+			}
+			else
+			{
+				power[1] -= 100;
+
+				//hunger
+				power[2] = 100;
+
+				//respect
+				{
+					if (power[3] >= 50)
+						power[3] = 100;
+					else
+						power[3] += 50;
+				}
+
+				//messages
+				{
+					printf("\n**************************************");
+					printf("\nKral bile böyle bi ziyafet çekmemişti.\n");
+					printf("Saygınığın %.f'e yükseldi\n", power[3]);
+					printf("Karnın tamamen doydu.\n\n");
+				}
+			}
+		}
+
+		else if (choice == 'm' || choice == 'M')
+		{
+			int possib;
+			//gold
+			if (power[1] < 10)
+			{
+				printf("\n*****************************\n");
+				printf("Paran yetersiz, biraz çalış.\n\n");
+			}
+			else
+			{
+				power[1] -= 10;
+
+				//poisoned
+				possib = rand() % ((10 + 1) - 1) + 1;
+				if (possib == 1 || possib == 9 || possib == 4 || possib == 6)
+				{
+					printf("\n***********************************************");
+					printf("\n Zehirlenerek kustun. Seni kasabaya götürdüler.\n Saygınlığın %d puan düştü.\n\n", possib);
+					choice = '€';
+					if (power[3] > possib)
+						power[3] -= possib;
+					else
+						power[3] = 0;
+				}
+
+				else
+				{
+					//hunger
+					{
+						if (power[2] >= 80)
+							power[2] = 100;
+						else
+							power[2] += 20;
+					}
+
+					//message
+					printf("\n********************");
+					printf("\nAçlık %.f'e yükseldi.\n\n", power[2]);
+				}
+			}
+		}
+
+		//update
+		if (choice != '€')
+		{
+			{
+				printf("- Z - Ziyafet\n");
+				printf("- P - Patates\n");
+				printf("- E - Ev yemekleri\n");
+				printf("- M - Mantar\n");
+				printf("- Ç - Çıkış\n");
+				printf("- i - Bilgi\n");
+				do {
+					printf("Hangi menüyü istiyorsun: ");
+					scanf(" %c", &choice);
+					if (choice != '‡' && choice != '€' && choice != 'E' && choice != 'e' && choice != 'p' && choice != 'P' && choice != 'M' && choice != 'm' && choice != 'i' && choice != '˜' && choice != 'z' && choice != 'Z')
+						printf("Geçersiz, ");
+				} while (choice != '‡' && choice != '€' && choice != 'E' && choice != 'e' && choice != 'p' && choice != 'P' && choice != 'M' && choice != 'm' && choice != 'i' && choice != '˜' && choice != 'z' && choice != 'Z');
+			}
+		}
+	}
+	printf("\n\n");
+	displaytree(name);
+}
+
+void townmenu(double power[], char name[], double gold[],double enemy[])
+{
+	char choice = 'A';
+	while (choice != '‡' && choice != '€') // it mans ç.
+	{
+		//display the statistics of character 
+		townstat(power);
+
+		//display and get choice
+		{
+			printf("- A - Arena\n");
+			printf("- Y - Yemekhane\n");
+			printf("- D - Dükkan\n");
+			printf("- S - Spor\n");
+			printf("- G - Görev\n");
+			printf("- C - $ CASINO $\n");
+			printf("- K - Kaydet\n");
+			printf("- Ç - Çıkış\n");
+			printf("- i - Bilgi\n");
+			do {
+				printf("Seçimini gir: ");
+				scanf(" %c", &choice);
+				if (choice != 'A' && choice != 'a' && choice != 'y' && choice != 'Y' && choice != 'd' && choice != 'D' && choice != 's' && choice != 'S' && choice != 'G' && choice != 'g' && choice != 'c' && choice != 'C' && choice != 'K' && choice != 'k' && choice != '‡' && choice != '€' && choice != 'i' && choice != '˜')
+					printf("Geçersiz seçim, ");
+			} while (choice != 'A' && choice != 'a' && choice != 'y' && choice != 'Y' && choice != 'd' && choice != 'D' && choice != 's' && choice != 'S' && choice != 'G' && choice != 'g' && choice != 'c' && choice != 'C' && choice != 'K' && choice != 'k' && choice != '‡' && choice != '€' && choice != 'i' && choice != '˜');
+		}
+
+		if (choice == 'i' || choice == '˜')
+			towninformation();
+
+		else if (choice == 'k' || choice == 'K')
+			savegame(power, gold, enemy);
+
+		else if (choice == 's' || choice == 'S')
+			spor(power, name, gold);
+
+		else if (choice == 'y' || choice == 'Y')
+			food(power, name);
+		else if (choice == 'a' || choice == 'A')
+			arena(name, power, gold, enemy);
+
+		else if (choice == 'D' || choice == 'd')
+			store(power, gold, name);
+		else if (choice == 'G' || choice == 'g')
+			duties(power, name);
+		else if (choice == 'c' || choice == 'C')
+			casino(power, name);
+	}
+}
+
+int main(void)
+{
+	//declare variables 
+	double power[SIZE], gold[6],enemy[4];
+	int namesize;
+	char name[10];
+
+	//include turkish characters and generate random characters
+	setlocale(LC_ALL, "Turkish");
+	srand(time(NULL));
+
+	//creating new game or loading game
+	opening(name, &namesize, power, gold, enemy);
+
+	//display trees
+	displaytree(name);
+
+	//town menu and while loop
+	townmenu(power, name, gold, enemy);
+
+	return(0);
+}
